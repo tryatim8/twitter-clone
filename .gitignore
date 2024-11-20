@@ -140,3 +140,7 @@ dmypy.json
 
 # the rest
 .swp
+/module_23_cgi_server/
+/module_27_postgres_migrations/
+/module_26_fastapi/
+/module_29_testing/
