@@ -1,0 +1,14 @@
+services:
+
+  postgres:
+    image:
+      postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - PG_OPTIONS="--log_destination=stderr --logging_collector=on --log_directory=/var/lib/postgresql/logs/report.log"
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres/tmp/:/var/lib/postgresql/data
+      - ./postgres/logs/:/var/lib/postgresql/logs
