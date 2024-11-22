@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, ARRAY, LargeBinary, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 
-from database import Base, engine, session
+from database import Base
 
 
 class User(Base):
@@ -38,6 +39,9 @@ class Like(Base):
 
     tweet_id = Column(Integer, ForeignKey('tweet.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
+    tweet_was_liked = relationship('Tweet', foreign_keys='Like.tweet_id', backref='likes', viewonly=True)
+    user_who_liked = relationship('User', foreign_keys='Like.user_id', backref='likes', viewonly=True)
+    name = association_proxy('user_who_liked', 'name')
 
 
 
@@ -48,25 +52,9 @@ class Follow(Base):
     follower_id = Column(Integer, ForeignKey('user.id'))
     following_id = Column(Integer, ForeignKey('user.id'))
     # Для получения подписок делаем join по follower_id
-    follower = relationship('User', backref='followings', foreign_keys='Follow.follower_id')
+    follower = relationship('User', backref='following', foreign_keys='Follow.follower_id')
     # Для получения подписчиков делаем join по following_id
-    following = relationship('User', backref='followers', foreign_keys='Follow.following_id')
-
-
-if __name__ == '__main__':
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    user1: User = User(api_key='test1', name='name_one')
-    user2: User = User(api_key='test2', name='name_two')
-    follow_1_2: Follow = Follow(follower_id=1, following_id=2)
-    follow_2_1: Follow = Follow(follower_id=2, following_id=1)
-    session.add_all([user1, user2, follow_1_2, follow_2_1])
-
-    media: Media = Media(file=b'abcdef')
-    tweet1: Tweet = Tweet(content='some_text', attachments=[1])
-    tweet1.medias.append(media)
-    user1.tweets.append(tweet1)
-    user2.liked_tweets.append(tweet1)
-    tweet1.users_who_liked.append(user1)
-
-    session.commit()
+    following_user = relationship('User', backref='followers', foreign_keys='Follow.following_id')
+    # Прокси follower_id -> id
+    id = association_proxy('follower', 'id')
+    name = association_proxy('follower', 'name')
