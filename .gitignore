@@ -144,3 +144,4 @@ dmypy.json
 /module_27_postgres_migrations/
 /module_26_fastapi/
 /module_29_testing/
+/test.db
