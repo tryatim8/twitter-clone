@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, List, Union
+from typing import Optional, List, Union
 import sys
 
 from fastapi import FastAPI, Response, Path, Body, Header, File
@@ -11,16 +11,18 @@ from backend_server.schemas import (ResultModel, ResultTweetModel, ResultMediaMo
 from backend_server.models import User, Tweet, Media, Like, Follow, Base
 from backend_server.database import session, engine
 
+
 def create_app():
     _app = FastAPI()
     return _app
+
 
 def connect_routes(app: FastAPI, my_session):
     """Функция для подключения роутов к приложению"""
     @app.post('/api/tweets', status_code=201)
     def create_new_tweet(api_key: str = Header(...),
                          tweet_data: str = Body(...),
-                         tweet_media_ids: Optional[Iterable[int]] = Body(None)):
+                         tweet_media_ids: Optional[List[int]] = Body(None)):
         """
         1. Создаёт запись твита и сохраняет в базу.
         Получает строку и медиафайлы. Возвращает id созданного твита.
@@ -46,7 +48,7 @@ def connect_routes(app: FastAPI, my_session):
         return ResultMediaModel(result=True, media_id=new_media.id)
 
 
-    @app.delete('/api/tweets/{tweet_id}', status_code=201, response_model=ResultModel)
+    @app.delete('/api/tweets/{tweet_id}', status_code=200, response_model=ResultModel)
     def remove_tweet(response: Response,
                      api_key: str = Header(...),
                      tweet_id: int = Path(...)):
@@ -88,7 +90,7 @@ def connect_routes(app: FastAPI, my_session):
 
 
     @app.delete('/api/tweets/{tweet_id}/likes')
-    def cancel_like_tweet(api_key: str = Header(...),
+    def remove_like_tweet(api_key: str = Header(...),
                           tweet_id: int = Path(...)):
         """
         4.2 Удаляет запись лайка из базы. Получает id твита.
@@ -185,25 +187,14 @@ def connect_routes(app: FastAPI, my_session):
         return ResultUserInfoModelOut(result=True, user=user)
 
 
-def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
-    base.metadata.drop_all(sqlalchemy_engine)
-    base.metadata.create_all(sqlalchemy_engine)
-    user1: User = User(api_key='test', name='name_one')
-    user2: User = User(api_key='test2', name='name_two')
-    follow_1_2: Follow = Follow(follower_id=1, following_id=2)
-    sqlalchemy_session.add_all([user1, user2, follow_1_2])
-
-    media: Media = Media(file=b'abcdef')
-    tweet1: Tweet = Tweet(content='some_text', attachments=[1])
-    tweet1.medias.append(media)
-    user1.tweets.append(tweet1)
-    user2.liked_tweets.append(tweet1)
-
-    sqlalchemy_session.commit()
-
+application = create_app()
+connect_routes(app=application, my_session=session)
 
 if __name__ == '__main__':
+    from tests.conftest import input_test_data
+    from frontend_client.fastapi_app import mount_static, connect_route_index
+
+    mount_static(app=application)
+    connect_route_index(app=application)
     input_test_data(base=Base, sqlalchemy_session=session, sqlalchemy_engine=engine)
-    application = create_app()
-    connect_routes(app=application, my_session=session)
-    uvicorn.run(app=application)
+    uvicorn.run(app=application, host='127.0.0.1', port=8000)

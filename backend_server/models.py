@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String, ARRAY, LargeBinary, ForeignKey, PrimaryKeyConstraint
+from sqlalchemy import Column, Integer, String, JSON, LargeBinary, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from database import Base
+from backend_server.database import Base
 
 
 class User(Base):
@@ -18,7 +18,7 @@ class Tweet(Base):
 
     id = Column(Integer, primary_key=True)
     content = Column(String, nullable=False)
-    attachments = Column(ARRAY(Integer))
+    attachments = Column(JSON)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship('User', backref='tweets')
     users_who_liked = relationship('User', secondary='like', backref='liked_tweets')
@@ -42,7 +42,6 @@ class Like(Base):
     tweet_was_liked = relationship('Tweet', foreign_keys='Like.tweet_id', backref='likes', viewonly=True)
     user_who_liked = relationship('User', foreign_keys='Like.user_id', backref='likes', viewonly=True)
     name = association_proxy('user_who_liked', 'name')
-
 
 
 class Follow(Base):
