@@ -33,7 +33,18 @@ services:
         restart: true
     networks:
       - my_network
-    stop_signal: SIGKILL
+
+  frontend_client:
+    build:
+      context: frontend_client
+    ports:
+      - '8080:80'
+    depends_on:
+      backend_server:
+        condition: service_started
+        restart: true
+    networks:
+      - my_network
 
 networks:
   my_network:
