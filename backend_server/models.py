@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, JSON, LargeBinary, ForeignKey, P
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from backend_server.database import Base
+from database import Base
 
 
 class User(Base):

@@ -1,14 +1,40 @@
 services:
 
-  postgres:
+  db_postgres:
     image:
       postgres
     environment:
+      - POSTGRES_DB=postgres
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - PG_OPTIONS="--log_destination=stderr --logging_collector=on --log_directory=/var/lib/postgresql/logs/report.log"
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d postgres -U admin']
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
     ports:
       - '5432:5432'
+    networks:
+      - my_network
     volumes:
       - ./postgres/tmp/:/var/lib/postgresql/data
       - ./postgres/logs/:/var/lib/postgresql/logs
+
+  backend_server:
+    build:
+      context: backend_server
+    ports:
+      - '5000:5000'
+    depends_on:
+      db_postgres:
+        condition: service_healthy
+        restart: true
+    networks:
+      - my_network
+    stop_signal: SIGKILL
+
+networks:
+  my_network:
+    driver: bridge

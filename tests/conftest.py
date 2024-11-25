@@ -4,7 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from backend_server.models import Base, User, Media, Follow, Tweet
-from backend_server.fastapi_api import create_app, connect_routes
+from backend_server.fastapi_api import create_app
+from backend_server.routes import connect_routes
 
 
 def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
