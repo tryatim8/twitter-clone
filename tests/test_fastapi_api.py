@@ -2,7 +2,8 @@ import pytest
 from backend_server.models import User, Tweet, Media, Like, Follow
 
 
-@pytest.mark.parametrize('route', ['/api/tweets', '/api/users/me', '/api/users/1', '/api/users/2',])
+@pytest.mark.parametrize('route',['/api/users/1', '/api/users/2', '/api/tweets',
+                                  '/api/users/me', '/api/medias/1', '/api/medias/2'])
 def test_ok_status_code(client, route):
     """Тест статус-кода 200 GET-запросов"""
     resp = client.get(route, headers={'api-key': 'test'})
@@ -29,6 +30,15 @@ def test_add_new_media(client, session):
     new_media = session.query(Media).filter(Media.id == 3).first()
     assert new_media.id == 3
     assert new_media.tweet_id is None
+
+
+def test_get_mediafile(client, session):
+    """Тест получения медиафайла"""
+    resp = client.get('/api/medias/1')
+    file = session.query(Media.file).filter(Media.id == 1).scalar()
+    assert resp.status_code == 200
+    assert isinstance(resp.content, bytes)
+    assert resp.content == file
 
 
 @pytest.mark.parametrize(('api_key', 'status_code', 'result'),
@@ -97,7 +107,7 @@ def test_get_tweets_list(client, session, api_key, status_code, result):
         tweets = result_json.get('tweets')
         tweets_db = session.query(Tweet).filter(Tweet.user_id == 1).all()
         assert len(tweets) == len(tweets_db)
-        assert len(tweets[0].get('attachments')) == len(tweets_db[0].attachments)
+        assert len(tweets[0].get('media_ids')) == len(tweets_db[0].media_ids)
     else:
         assert 'NoResultFound' in result_json.get('error_type')
 

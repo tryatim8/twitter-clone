@@ -22,7 +22,7 @@ def connect_routes(app: FastAPI, my_session):
         """
         user_id = my_session.query(User.id).filter(User.api_key == api_key).scalar()
         new_tweet = Tweet(content=tweet_data,
-                          attachments=tweet_media_ids,
+                          media_ids=tweet_media_ids,
                           user_id=user_id)
         my_session.add(new_tweet)
         my_session.commit()
@@ -39,6 +39,16 @@ def connect_routes(app: FastAPI, my_session):
         my_session.add(new_media)
         my_session.commit()
         return ResultMediaModel(result=True, media_id=new_media.id)
+
+
+    @app.get('/api/medias/{media_id}', response_class=Response)
+    def get_mediafile(media_id: int = Path(...)):
+        """
+        2.1. Находит запись медиафайла из БД по media_id.
+        Получает media_id из пути запроса. Возвращает пользователю медиафайл в байтах.
+        """
+        mediafile: bytes = my_session.query(Media.file).filter(Media.id == media_id).scalar()
+        return Response(content=mediafile, media_type='image')
 
 
     @app.delete('/api/tweets/{tweet_id}', status_code=200, response_model=ResultModel)

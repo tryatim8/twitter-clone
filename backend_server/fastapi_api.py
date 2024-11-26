@@ -22,8 +22,10 @@ def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
         sqlalchemy_session.add_all([user1, user2, follow_1_2])
         sqlalchemy_session.flush()
 
-        media1: Media = Media(file=b'abcd')
-        media2: Media = Media(file=b'efgh')
+        with open('img_1.png', 'rb') as img_one:
+            with open('img_2.png', 'rb') as img_two:
+                media1: Media = Media(file=img_one.read())
+                media2: Media = Media(file=img_two.read())
         tweet1: Tweet = Tweet(content='some_text', attachments=[1, 2])
         tweet2: Tweet = Tweet(content='some_text2', attachments=[2])
         tweet1.medias.extend([media1, media2])
