@@ -1,12 +1,10 @@
-import os.path
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend_server.models import Base, User, Media, Follow, Tweet
 from backend_server.fastapi_api import create_app
+from backend_server.models import Base, Follow, Media, Tweet, User
 from backend_server.routes import connect_routes
 
 
@@ -17,7 +15,6 @@ def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
     user2: User = User(api_key='test2', name='name_two')
     follow_1_2: Follow = Follow(follower_id=1, following_id=2)
     sqlalchemy_session.add_all([user1, user2, follow_1_2])
-
 
     with open('img_1.png', 'rb') as img_one:
         with open('img_1.png', 'rb') as img_two:
@@ -48,7 +45,9 @@ def session(engine):
 
 @pytest.fixture
 def app(engine, session):
-    input_test_data(base=Base, sqlalchemy_session=session, sqlalchemy_engine=engine)
+    input_test_data(base=Base,
+                    sqlalchemy_session=session,
+                    sqlalchemy_engine=engine)
     _app = create_app()
     connect_routes(app=_app, my_session=session)
     return _app

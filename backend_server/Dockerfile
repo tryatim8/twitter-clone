@@ -5,6 +5,7 @@ RUN apt-get update && /usr/bin/apt-get install -y python3-dev && rm -rf /var/lib
 COPY  requirements.txt /backend_server/
 
 RUN pip install --upgrade pip
+
 RUN pip install -r /backend_server/requirements.txt
 
 COPY __init__.py database.py fastapi_api.py main.py models.py routes.py schemas.py /backend_server/

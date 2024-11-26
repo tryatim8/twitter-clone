@@ -1,8 +1,9 @@
-from fastapi import FastAPI
-from sqlalchemy import exc
 import logging
 
-from models import User, Tweet, Media, Follow
+from fastapi import FastAPI
+from sqlalchemy import exc
+
+from backend_server.models import Follow, Media, Tweet, User
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

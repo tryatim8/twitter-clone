@@ -1,9 +1,14 @@
 import pytest
-from backend_server.models import User, Tweet, Media, Like, Follow
+
+from backend_server.models import Follow, Like, Media, Tweet, User
 
 
-@pytest.mark.parametrize('route',['/api/users/1', '/api/users/2', '/api/tweets',
-                                  '/api/users/me', '/api/medias/1', '/api/medias/2'])
+@pytest.mark.parametrize(
+    'route', [
+        '/api/users/1', '/api/users/2', '/api/tweets',
+        '/api/users/me', '/api/medias/1', '/api/medias/2'
+    ]
+)
 def test_ok_status_code(client, route):
     """Тест статус-кода 200 GET-запросов"""
     resp = client.get(route, headers={'api-key': 'test'})
@@ -59,7 +64,9 @@ def test_like_tweet(client, session, tweet_id, result):
     resp = client.post(route, headers={'api-key': 'test'})
     assert resp.status_code == 201
     assert resp.json() == {'result': result}
-    assert session.query(Like).filter(Like.tweet_id == tweet_id).filter(Like.user_id == 1).first() is not None
+    assert session.query(Like).filter(
+        Like.tweet_id == tweet_id).filter(
+        Like.user_id == 1).first() is not None
 
 
 @pytest.mark.parametrize(('tweet_id', 'result'), [(2, True), (1, False)])
@@ -85,7 +92,7 @@ def test_follow_user(client, session, following_id, result):
 
 
 @pytest.mark.parametrize(('following_id', 'result'), [(2, True), (1, False)])
-def test_follow_user(client, session, following_id, result):
+def test_cancel_follow_user(client, session, following_id, result):
     """Тест удаления подписки"""
     route = '/api/users/{}/follow'.format(following_id)
     resp = client.delete(route, headers={'api-key': 'test'})
@@ -105,7 +112,7 @@ def test_get_tweets_list(client, session, api_key, status_code, result):
     assert result_json.get('result') == result
     if status_code == 200:
         tweets = result_json.get('tweets')
-        tweets_db = session.query(Tweet).filter(Tweet.user_id == 1).all()
+        tweets_db = session.query(Tweet).filter(Tweet.user_id != 1).all()
         assert len(tweets) == len(tweets_db)
         assert len(tweets[0].get('media_ids')) == len(tweets_db[0].media_ids)
     else:
