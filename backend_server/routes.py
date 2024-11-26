@@ -48,7 +48,7 @@ def connect_routes(app: FastAPI, my_session):
         Получает media_id из пути запроса. Возвращает пользователю медиафайл в байтах.
         """
         mediafile: bytes = my_session.query(Media.file).filter(Media.id == media_id).scalar()
-        return Response(content=mediafile, media_type='image')
+        return Response(content=mediafile, media_type='image/png')
 
 
     @app.delete('/api/tweets/{tweet_id}', status_code=200, response_model=ResultModel)
@@ -159,7 +159,7 @@ def connect_routes(app: FastAPI, my_session):
         """
         try:
             user: User = my_session.query(User).filter(User.api_key == api_key).one()
-            tweets: List[Tweet] = user.tweets
+            tweets: List[Tweet] = my_session.query(Tweet).filter(Tweet.user_id != user.id).all()
             return ResultTweetsModel(result=True, tweets=tweets)
         except (NoResultFound, MultipleResultsFound):
             response.status_code = 400

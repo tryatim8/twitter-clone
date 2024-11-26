@@ -26,8 +26,8 @@ def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
             with open('img_2.png', 'rb') as img_two:
                 media1: Media = Media(file=img_one.read())
                 media2: Media = Media(file=img_two.read())
-        tweet1: Tweet = Tweet(content='some_text', attachments=[1, 2])
-        tweet2: Tweet = Tweet(content='some_text2', attachments=[2])
+        tweet1: Tweet = Tweet(content='some_text', media_ids=[1, 2])
+        tweet2: Tweet = Tweet(content='some_text2', media_ids=[2])
         tweet1.medias.extend([media1, media2])
         tweet2.medias.append(media2)
         user1.tweets.append(tweet1)
