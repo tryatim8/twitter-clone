@@ -41,7 +41,7 @@ class TweetModel(BaseModel):
     id: int
     content: str
     media_ids: list[int]
-    user: UserModel
+    author: UserModel
     likes: List[LikeModel]
 
     @computed_field

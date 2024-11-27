@@ -28,7 +28,7 @@ class Tweet(Base):
     content = Column(String, nullable=False)
     media_ids = Column(JSON)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship('User', backref='tweets')
+    author = relationship('User', backref='tweets')
     users_who_liked = relationship('User',
                                    secondary='like', backref='liked_tweets')
 
