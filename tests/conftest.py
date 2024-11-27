@@ -1,14 +1,23 @@
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine.base import Engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm.decl_api import DeclarativeMeta
 
+from backend_server.database import Base
 from backend_server.fastapi_api import create_app
-from backend_server.models import Base, Follow, Media, Tweet, User
+from backend_server.models import Follow, Media, Tweet, User
 from backend_server.routes import connect_routes
 
 
-def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
+def input_test_data(
+        base: DeclarativeMeta,
+        sqlalchemy_session: Session,
+        sqlalchemy_engine: Engine,
+) -> None:
+    """Добавляет первичные данные в БД приложения"""
     base.metadata.drop_all(sqlalchemy_engine)
     base.metadata.create_all(sqlalchemy_engine)
     user1: User = User(api_key='test', name='name_one')
@@ -32,19 +41,22 @@ def input_test_data(base, sqlalchemy_session, sqlalchemy_engine):
 
 
 @pytest.fixture
-def engine():
+def engine() -> Engine:
+    """Инициализация экземпляра двигателя БД"""
     _engine = create_engine('sqlite:///test.db')
     return _engine
 
 
 @pytest.fixture
-def session(engine):
+def session(engine: Engine) -> Session:
+    """Инициализация экземпляра объекта сессии ORM"""
     _Session = sessionmaker(engine)
     return _Session()
 
 
 @pytest.fixture
-def app(engine, session):
+def app(engine: Engine, session: Session) -> FastAPI:
+    """Инициализация экземпляра приложения"""
     input_test_data(base=Base,
                     sqlalchemy_session=session,
                     sqlalchemy_engine=engine)
@@ -54,6 +66,7 @@ def app(engine, session):
 
 
 @pytest.fixture
-def client(app):
+def client(app: FastAPI) -> TestClient:
+    """Инициализация экземпляра тестового клиента"""
     _client = TestClient(app=app)
     return _client

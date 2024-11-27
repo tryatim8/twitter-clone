@@ -10,12 +10,12 @@ class ResultModel(BaseModel):
 
 class ResultTweetModel(ResultModel):
     """Возвращает результат и tweet_id"""
-    tweet_id: int
+    tweet_id: Optional[int]
 
 
 class ResultMediaModel(ResultModel):
     """Возвращает результат и media_id"""
-    media_id: int
+    media_id: Optional[int]
 
 
 class UserModel(BaseModel):
