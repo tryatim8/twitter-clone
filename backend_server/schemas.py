@@ -1,6 +1,6 @@
-from typing import Optional, Iterable, List
+from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
 
 class ResultModel(BaseModel):
@@ -10,12 +10,12 @@ class ResultModel(BaseModel):
 
 class ResultTweetModel(ResultModel):
     """Возвращает результат и tweet_id"""
-    tweet_id: int
+    tweet_id: Optional[int]
 
 
 class ResultMediaModel(ResultModel):
     """Возвращает результат и media_id"""
-    media_id: int
+    media_id: Optional[int]
 
 
 class UserModel(BaseModel):
@@ -40,9 +40,15 @@ class TweetModel(BaseModel):
     """Модель твита для возвращения пользователю"""
     id: int
     content: str
-    attachments: Optional[Iterable[int]] = None
-    user: UserModel
+    media_ids: list[int]
+    author: UserModel
     likes: List[LikeModel]
+
+    @computed_field
+    def attachments(self) -> Optional[List[str]]:
+        return None if not self.media_ids else [
+            f'/api/medias/{media_id}' for media_id in self.media_ids
+        ]
 
     class Config:
         from_attributes = True

@@ -145,3 +145,4 @@ dmypy.json
 /module_26_fastapi/
 /module_29_testing/
 /test.db
+/tests/test.db
