@@ -25,7 +25,6 @@ def input_test_data(
 ) -> None:
     """Добавляет первичные данные в БД приложения"""
     try:
-        base.metadata.drop_all(sqlalchemy_engine)
         base.metadata.create_all(sqlalchemy_engine)
         user1: User = User(api_key='test', name='name_one')
         user2: User = User(api_key='test2', name='name_two')
