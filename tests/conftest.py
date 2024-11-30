@@ -25,8 +25,8 @@ def input_test_data(
     follow_1_2: Follow = Follow(follower_id=1, following_id=2)
     sqlalchemy_session.add_all([user1, user2, follow_1_2])
 
-    with open('img_1.png', 'rb') as img_one:
-        with open('img_1.png', 'rb') as img_two:
+    with open('tests/img_1.png', 'rb') as img_one:
+        with open('tests/img_1.png', 'rb') as img_two:
             media1: Media = Media(file=img_one.read())
             media2: Media = Media(file=img_two.read())
     tweet1: Tweet = Tweet(content='some_text', media_ids=[1, 2])
